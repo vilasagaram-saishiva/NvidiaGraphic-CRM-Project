@@ -6,8 +6,8 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"Relative_URL": {
-				"type": "String"
+			"relative_url": {
+				"type": "string"
 			}
 		},
 		"annotations": [],

@@ -100,13 +100,7 @@
 							"inputs": [
 								{
 									"referenceName": "raw_files",
-									"type": "DatasetReference",
-									"parameters": {
-										"Relative_URL": {
-											"value": "@item().Relative_URL",
-											"type": "Expression"
-										}
-									}
+									"type": "DatasetReference"
 								}
 							],
 							"outputs": [
