@@ -8,12 +8,6 @@
 		"parameters": {
 			"Relative_URL": {
 				"type": "String"
-			},
-			"sink_folder": {
-				"type": "string"
-			},
-			"sink_file": {
-				"type": "string"
 			}
 		},
 		"annotations": [],

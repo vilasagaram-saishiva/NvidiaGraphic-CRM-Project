@@ -36,8 +36,6 @@
 			{
 				"name": "ForEach file",
 				"type": "ForEach",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "lookup for file",
@@ -71,19 +69,22 @@
 									"type": "DelimitedTextSource",
 									"storeSettings": {
 										"type": "HttpReadSettings",
-										"requestMethod": "GET"
+										"requestMethod": "GET",
+										"requestTimeout": ""
 									},
 									"formatSettings": {
 										"type": "DelimitedTextReadSettings"
 									}
 								},
 								"sink": {
-									"type": "ParquetSink",
+									"type": "DelimitedTextSink",
 									"storeSettings": {
 										"type": "AzureBlobFSWriteSettings"
 									},
 									"formatSettings": {
-										"type": "ParquetWriteSettings"
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
 									}
 								},
 								"enableStaging": false,
@@ -104,7 +105,15 @@
 										"Relative_URL": {
 											"value": "@item().Relative_URL",
 											"type": "Expression"
-										},
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "sink_file",
+									"type": "DatasetReference",
+									"parameters": {
 										"sink_folder": {
 											"value": "@item().sink_folder",
 											"type": "Expression"
@@ -114,12 +123,6 @@
 											"type": "Expression"
 										}
 									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "Parquet2",
-									"type": "DatasetReference"
 								}
 							]
 						}
