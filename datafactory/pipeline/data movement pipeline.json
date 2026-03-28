@@ -108,6 +108,10 @@
 										"sink_folder": {
 											"value": "@item().sink_folder",
 											"type": "Expression"
+										},
+										"sink_file": {
+											"value": "@item().sink_file",
+											"type": "Expression"
 										}
 									}
 								}
