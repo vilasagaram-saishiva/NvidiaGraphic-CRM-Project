@@ -1,0 +1,9 @@
+{
+	"name": "ng-crm-adf",
+	"location": "malaysiawest",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "e1bbd598-4a6f-4e47-90ab-29ad1def5067",
+		"tenantId": "bdb14220-2ef0-4e44-b715-9e3824cbedfa"
+	}
+}

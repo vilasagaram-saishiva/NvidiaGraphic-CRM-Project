@@ -1,0 +1,191 @@
+{
+	"name": "data movement pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "lookup for file",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "Json1",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach file",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "lookup for file",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lookup for file').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "copy all the files",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET",
+										"requestTimeout": ""
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "raw_files",
+									"type": "DatasetReference",
+									"parameters": {
+										"relative_url": {
+											"value": "@item().Relative_URL",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "sink_file",
+									"type": "DatasetReference",
+									"parameters": {
+										"sink_folder": {
+											"value": "@item().sink_folder",
+											"type": "Expression"
+										},
+										"sink_file": {
+											"value": "@item().sink_file",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "success",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "ForEach file",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"url": "https://prod-20.malaysiawest.logic.azure.com:443/workflows/2b734fdafb034208b19ac080cc0cedaa/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=gUBn-6JXjigzQtvT1WWVVKASJzGVUikSng7nkGzRkbQ",
+					"body": {
+						"value": "{\n    \"PipelineName\": \"@{pipeline().Pipeline}\",\n    \"Status\": \"Success\",\n    \"RunId\": \"@{pipeline().RunId}\",\n    \"TriggerTime\": \"@{utcNow()}\",\n    \"Message\": \"Pipeline completed successfully\"\n}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "failure",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "ForEach file",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"url": "https://prod-20.malaysiawest.logic.azure.com:443/workflows/2b734fdafb034208b19ac080cc0cedaa/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=gUBn-6JXjigzQtvT1WWVVKASJzGVUikSng7nkGzRkbQ",
+					"body": {
+						"value": "{\n    \"PipelineName\": \"@{pipeline().Pipeline}\",\n    \"Status\": \"Fail\",\n    \"RunId\": \"@{pipeline().RunId}\",\n    \"TriggerTime\": \"@{utcNow()}\",\n    \"Message\": \"Pipeline completed successfully\"\n}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
