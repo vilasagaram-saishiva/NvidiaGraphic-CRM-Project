@@ -12,7 +12,7 @@
 			"value": "https://ngadls2.dfs.core.windows.net/"
 		},
 		"raw dataset_properties_typeProperties_url": {
-			"value": "https://github.com"
+			"value": "https://raw.githubusercontent.com/"
 		},
 		"containerUri": {
 			"value": ""
